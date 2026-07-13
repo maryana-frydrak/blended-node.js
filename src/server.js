@@ -1,6 +1,7 @@
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
+import productsRoutes from './routes/productsRoutes.js';
 
 import { connectMongoDB } from './db/connectMongoDB.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -14,6 +15,8 @@ app.use(logger);
 
 app.use(express.json());
 app.use(cors());
+
+app.use(productsRoutes);
 
 app.use(notFoundHandler);
 
