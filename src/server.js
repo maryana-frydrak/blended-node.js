@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import productsRoutes from './routes/productsRoutes.js';
+import authRotes from './routes/authRoutes.js';
 
 import { connectMongoDB } from './db/connectMongoDB.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use(productsRoutes);
+app.use(authRotes);
 
 app.use(notFoundHandler);
 
