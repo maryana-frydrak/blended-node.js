@@ -2,9 +2,41 @@ import createHttpError from 'http-errors';
 import { Product } from '../models/product.js';
 
 export const getAllProducts = async (req, res) => {
-  const products = await Product.find({ userId: req.user._id });
+  const { category, searsh, page = 1, perPage = 10 } = req.query;
 
-  res.status(200).json(products);
+  const pageNum = Number(page);
+  const perPageNum = Number(perPage);
+  const skip = (pageNum - 1) * perPageNum;
+
+  const myQuery = Product.find({ userId: req.user._id });
+
+  if (category) {
+    myQuery.where({ category });
+  }
+
+  if (searsh) {
+    myQuery.where({
+      $or: [
+        { name: { $regect: searsh, $options: 'i' } },
+        { description: { $regect: searsh, $options: 'i' } },
+      ],
+    });
+  }
+
+  const [totalItems, products] = await Promise.all([
+    myQuery.clone().countDocuments(),
+    myQuery.skip(skip).limit(perPageNum).exec(),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / perPageNum);
+
+  res.status(200).json({
+    page: pageNum,
+    perPage: perPageNum,
+    totalItems,
+    totalPages,
+    products,
+  });
 };
 
 export const getProductById = async (req, res) => {
